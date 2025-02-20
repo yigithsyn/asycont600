@@ -11,7 +11,7 @@ axes = {
   "y"        : "2",
   "z"        : "3",
   "Pol"      : "4",
-  "AUT Slide": "5",
+  "AUT_Slide": "5",
   "Azimuth"  : "6"
 }
 
@@ -20,7 +20,7 @@ axes_sped = {
   "y"        : {"slow": 0.1,   "medi": 0.4,   "fast": 1.0  },
   "z"        : {"slow": 0.010, "medi": 0.015, "fast": 0.020 },
   "Pol"      : {"slow": 10,    "medi": 60,    "fast": 120   },
-  "AUT Slide": {"slow": 0.01,  "medi": 0.05,  "fast": 0.2   },
+  "AUT_Slide": {"slow": 0.01,  "medi": 0.05,  "fast": 0.2   },
   "Azimuth"  : {"slow": 1,     "medi": 5,     "fast": 12    }
 }
 
@@ -85,7 +85,7 @@ class Asycont600_2:
     try:
       resp = self.socket.recv(4*1024)
       pos  = float(ElementTree.fromstring(resp.decode()).find("section").find("entry").get("v1"))
-      if axis == "x" or axis == "y" or axis == "z" or axis == "AUT Slide":
+      if axis == "x" or axis == "y" or axis == "z" or axis == "AUT_Slide":
         return round(pos, 3)
       elif axis == "Pol":
         return round(pos, 3)

@@ -5,10 +5,20 @@ from typing import Union
 from fastapi import FastAPI
 import uvicorn
 
+from asycont600 import Asycont600_2
+
 def greet(
   port: Annotated[int, typer.Option(help="Server TCP Port")] = 7300
 ): 
+
+  cont = Asycont600_2()
+  cont.connect()
+
   app = FastAPI()
+
+  @app.get("/move/abs/slow/{axis}/{pos}")
+  def move_abs_slow(axis: str, pos: float):
+    cont.move_abs_slow(axis, pos)
 
   @app.get("/")
   def read_root():
