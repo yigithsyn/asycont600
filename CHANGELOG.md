@@ -6,9 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fix
+- Changelog file header
+
 ## [0.2.3] - 2025-03-03
 
-### Removec
+### Removed
 - Seperate movements for slow, medium and fast speeds
 
 ### Added
