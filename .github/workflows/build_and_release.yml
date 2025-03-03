@@ -69,9 +69,10 @@ jobs:
   #       '${{ github.ref_name }}' dist/**
   #       --repo '${{ github.repository }}'
 
-  name: Create Release
-  runs-on: ubuntu-latest
-  steps:
+  Release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
     - name: Get version from tag
       id: tag_name
       run: |
