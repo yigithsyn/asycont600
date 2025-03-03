@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fix
 - Changelog file header
 
-## [0.2.4] - 2025-03-03
+## [0.2.5] - 2025-03-03
 
 ### Removed
 - Seperate movements for slow, medium and fast speeds

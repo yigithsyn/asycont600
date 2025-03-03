@@ -70,6 +70,8 @@ jobs:
   #       --repo '${{ github.repository }}'
 
   Release:
+    needs:
+    - build
     name: Create Release
     runs-on: ubuntu-latest
     steps:
