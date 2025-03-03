@@ -1,28 +1,34 @@
 
-__version__ = "0.1.3"
+__version__ = "0.2.0"
 
 import socket
 import time
 import xml.etree.ElementTree as ET
 import xml.etree.ElementTree as ElementTree
+from enum import StrEnum
 
 axes = {
-  "x"        : "1",
-  "y"        : "2",
-  "z"        : "3",
-  "Pol"      : "4",
-  "AUT_Slide": "5",
-  "Azimuth"  : "6"
+  "x"       : "1",
+  "y"       : "2",
+  "z"       : "3",
+  "pol"     : "4",
+  "autslide": "5",
+  "azimuth" : "6"
 }
 
 axes_sped = {
-  "x"        : {"slow": 0.05,  "medi": 0.1,   "fast": 0.4   },
-  "y"        : {"slow": 0.1,   "medi": 0.4,   "fast": 1.0  },
-  "z"        : {"slow": 0.010, "medi": 0.015, "fast": 0.020 },
-  "Pol"      : {"slow": 10,    "medi": 60,    "fast": 120   },
-  "AUT_Slide": {"slow": 0.01,  "medi": 0.05,  "fast": 0.2   },
-  "Azimuth"  : {"slow": 1,     "medi": 5,     "fast": 12    }
+  "x"       : {"slow": 0.05,  "medi": 0.1,   "fast": 0.4   },
+  "y"       : {"slow": 0.1,   "medi": 0.4,   "fast": 1.0  },
+  "z"       : {"slow": 0.010, "medi": 0.015, "fast": 0.020 },
+  "pol"     : {"slow": 10,    "medi": 60,    "fast": 120   },
+  "autslide": {"slow": 0.01,  "medi": 0.05,  "fast": 0.2   },
+  "azimuth" : {"slow": 1,     "medi": 5,     "fast": 12    }
 }
+
+class SPEED(StrEnum):
+  SLOW = "slow"
+  MEDI = "medi"
+  FAST = "fast"
 
 class Asycont600_2:
   def __init__(self):
@@ -36,45 +42,27 @@ class Asycont600_2:
   def disconnect(self):
       self.socket.close()
 
-  def move_abs(self, axis: str, pos: float) -> None:
-    xmls = '<command name="MoveAbs" axis="%s" Acceleration="0.1" Deceleration="0.1" Velocity="0.1" Direction="Auto" Position="%.3f" />' \
-    %(axes[axis], pos)
+  def acknowledge(self):
+    xmls = '<command name="Ack" />' 
     xmls = xmls.replace("\n","")
-    # print(xmls)
     msg = bytes(xmls,"UTF-8")
-    self.socket.send(msg)
-    while self.get_position(axis) != pos:
-      time.sleep(0.5)
+    for i in range(6):
+      self.socket.send(msg)
 
-  def move_abs_slow(self, axis: str, pos: float) -> None:
+  def move_abs(self, axis: str, pos: float, speed: SPEED = SPEED.SLOW) -> None:
+    self.acknowledge()
     xmls = '<command name="MoveAbs" axis="%s" Acceleration="%s" Deceleration="%s" Velocity="%s" Direction="Auto" Position="%.3f" />' \
-    %(axes[axis], axes_sped[axis]["slow"], axes_sped[axis]["slow"], axes_sped[axis]["slow"], pos)
-    xmls = xmls.replace("\n","")
-    # print(xmls)
+    %(axes[axis], axes_sped[axis][speed.value], axes_sped[axis][speed.value], axes_sped[axis][speed.value], pos)
     msg = bytes(xmls,"UTF-8")
     self.socket.send(msg)
-    while self.get_position(axis) != pos:
-      time.sleep(0.5)    
 
-  def move_abs_intermediate(self, axis: str, pos: float) -> None:
+  def move_rel(self, axis: str, pos: float, speed: SPEED = SPEED.SLOW) -> None:
+    self.acknowledge()
+    pos += self.get_position(axis)
     xmls = '<command name="MoveAbs" axis="%s" Acceleration="%s" Deceleration="%s" Velocity="%s" Direction="Auto" Position="%.3f" />' \
-    %(axes[axis], axes_sped[axis]["medi"], axes_sped[axis]["medi"], axes_sped[axis]["medi"], pos)
-    xmls = xmls.replace("\n","")
-    # print(xmls)
+    %(axes[axis], axes_sped[axis][speed.value], axes_sped[axis][speed.value], axes_sped[axis][speed.value], pos)
     msg = bytes(xmls,"UTF-8")
     self.socket.send(msg)
-    while self.get_position(axis) != pos:
-      time.sleep(0.5)    
-
-  def move_abs_fast(self, axis: str, pos: float) -> None:
-    xmls = '<command name="MoveAbs" axis="%s" Acceleration="%s" Deceleration="%s" Velocity="%s" Direction="Auto" Position="%.3f" />' \
-    %(axes[axis], axes_sped[axis]["fast"], axes_sped[axis]["fast"], axes_sped[axis]["fast"], pos)
-    xmls = xmls.replace("\n","")
-    # print(xmls)
-    msg = bytes(xmls,"UTF-8")
-    self.socket.send(msg)
-    while self.get_position(axis) != pos:
-      time.sleep(0.5)    
 
   def get_position(self, axis: str) -> float:
     xmls = '<state><section name="Axis %s"><query name="System Position" /></section></state>' \
@@ -85,9 +73,9 @@ class Asycont600_2:
     try:
       resp = self.socket.recv(4*1024)
       pos  = float(ElementTree.fromstring(resp.decode()).find("section").find("entry").get("v1"))
-      if axis == "x" or axis == "y" or axis == "z" or axis == "AUT_Slide":
+      if axis == "x" or axis == "y" or axis == "z" or axis == "autslide":
         return round(pos, 3)
-      elif axis == "Pol":
+      elif axis == "pol":
         return round(pos, 3)
       else:
         return round(pos, 2)
@@ -100,6 +88,12 @@ class Asycont600_2:
       %(axes[axis])
       msg = bytes(xmls,"UTF-8")
       self.socket.send(msg)
+
+  def stop(self, axis: str) -> None:
+    xmls = '<command name="Stop" axis="Axis %s" Deceleration="%s" />' \
+    %(axes[axis], axes_sped[axis]["slow"])
+    msg = bytes(xmls,"UTF-8")
+    self.socket.send(msg)    
 
     # emsg = bytes(xmls,"UTF-8")
     # self.socket.send(emsg)
