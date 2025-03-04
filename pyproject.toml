@@ -18,8 +18,8 @@ classifiers = [
 readme = "README.md"
 license = {text = "MIT"}
 
-# [project.scripts]
-# asycont600_srv = "asycont600.srv:app"
+[project.scripts]
+asycont600 = "asycont600.__main__:app"
 
 [build-system]
 requires = ["pdm-backend"]
