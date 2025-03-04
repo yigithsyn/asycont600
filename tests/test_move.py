@@ -9,7 +9,10 @@ from asycont600 import Asycont600_2
 
 cont = Asycont600_2()
 cont.connect()
-cont.move_abs("x", 2)
+# cont.move("y", -1)
+# cont.move("y", 0, asycont600.MOVE_TYPE.ABSOLUTE)
+# cont.move("y", -2, "relative", "fast")
+print(cont.position("y"))
 # cont.set_ref0("y")
 cont.disconnect()
 

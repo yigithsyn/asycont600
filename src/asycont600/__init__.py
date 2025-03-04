@@ -1,5 +1,5 @@
 
-__version__ = "0.2.5"
+__version__ = "0.3.0"
 
 import socket
 import time
@@ -17,18 +17,22 @@ axes = {
 }
 
 axes_sped = {
-  "x"       : {"slow": 0.05,  "medi": 0.1,   "fast": 0.4   },
-  "y"       : {"slow": 0.1,   "medi": 0.4,   "fast": 1.0  },
-  "z"       : {"slow": 0.010, "medi": 0.015, "fast": 0.020 },
-  "pol"     : {"slow": 10,    "medi": 60,    "fast": 120   },
-  "autslide": {"slow": 0.01,  "medi": 0.05,  "fast": 0.2   },
-  "azimuth" : {"slow": 1,     "medi": 5,     "fast": 12    }
+  "x"       : {"slow": 0.05,  "medium": 0.1,   "fast": 0.4   },
+  "y"       : {"slow": 0.1,   "medium": 0.4,   "fast": 1.0  },
+  "z"       : {"slow": 0.010, "medium": 0.015, "fast": 0.020 },
+  "pol"     : {"slow": 10,    "medium": 60,    "fast": 120   },
+  "autslide": {"slow": 0.01,  "medium": 0.05,  "fast": 0.2   },
+  "azimuth" : {"slow": 1,     "medium": 5,     "fast": 12    }
 }
 
 class SPEED(StrEnum):
-  SLOW = "slow"
-  MEDI = "medi"
-  FAST = "fast"
+  SLOW   = "slow"
+  MEDIUM = "medium"
+  FAST   = "fast"
+
+class MOVE_TYPE(StrEnum):
+  ABSOLUTE = "absolute"
+  RELATIVE = "relative"
 
 class Asycont600_2:
   def __init__(self):
@@ -49,22 +53,15 @@ class Asycont600_2:
     for i in range(6):
       self.socket.send(msg)
 
-  def move_abs(self, axis: str, pos: float, speed: SPEED = SPEED.SLOW) -> None:
+  def move(self, axis: str, pos: float, mtype: MOVE_TYPE = MOVE_TYPE.RELATIVE, speed: SPEED = SPEED.SLOW) -> None:
     self.acknowledge()
+    if mtype == MOVE_TYPE.RELATIVE: pos += self.position(axis) 
     xmls = '<command name="MoveAbs" axis="%s" Acceleration="%s" Deceleration="%s" Velocity="%s" Direction="Auto" Position="%.3f" />' \
-    %(axes[axis], axes_sped[axis][speed.value], axes_sped[axis][speed.value], axes_sped[axis][speed.value], pos)
+    %(axes[axis], axes_sped[axis][str(speed)], axes_sped[axis][str(speed)], axes_sped[axis][str(speed)], pos)
     msg = bytes(xmls,"UTF-8")
     self.socket.send(msg)
 
-  def move_rel(self, axis: str, pos: float, speed: SPEED = SPEED.SLOW) -> None:
-    self.acknowledge()
-    pos += self.get_position(axis)
-    xmls = '<command name="MoveAbs" axis="%s" Acceleration="%s" Deceleration="%s" Velocity="%s" Direction="Auto" Position="%.3f" />' \
-    %(axes[axis], axes_sped[axis][speed.value], axes_sped[axis][speed.value], axes_sped[axis][speed.value], pos)
-    msg = bytes(xmls,"UTF-8")
-    self.socket.send(msg)
-
-  def get_position(self, axis: str) -> float:
+  def position(self, axis: str) -> float:
     xmls = '<state><section name="Axis %s"><query name="System Position" /></section></state>' \
     %(axes[axis]) 
     # print(xmls)

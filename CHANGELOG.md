@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fix
-- Changelog file header
+## [0.3.0] - 2025-03-04
+
+### Changed
+- Absolute and relative movements are merged in a single function
+- Function names are updated
 
 ## [0.2.5] - 2025-03-03
 
