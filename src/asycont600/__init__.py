@@ -1,5 +1,5 @@
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 import socket
 import time
@@ -80,11 +80,17 @@ class Asycont600_2:
       print("Read error")
       raise 
 
-  def set_ref0(self, axis: str) -> None:
-      xmls = '<command name="Reference" axis="Axis %s" NewPosition="0" />' \
-      %(axes[axis])
-      msg = bytes(xmls,"UTF-8")
-      self.socket.send(msg)
+  def set_reference(self, axis: str) -> None:
+    xmls = '<command name="Reference" axis="Axis %s" NewPosition="0" />' \
+    %(axes[axis])
+    msg = bytes(xmls,"UTF-8")
+    self.socket.send(msg)
+
+  def set_offset(self, axis: str, offset: float) -> None:
+    xmls = '<command name="Reference" axis="Axis %s" Offset="%.3f" />'%offset \
+    %(axes[axis])
+    msg = bytes(xmls,"UTF-8")
+    self.socket.send(msg)
 
   def stop(self, axis: str) -> None:
     xmls = '<command name="Stop" axis="Axis %s" Deceleration="%s" />' \
