@@ -1,5 +1,5 @@
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 
 import socket
 import time
@@ -87,8 +87,8 @@ class Asycont600_2:
     self.socket.send(msg)
 
   def set_offset(self, axis: str, offset: float) -> None:
-    xmls = '<command name="Reference" axis="Axis %s" Offset="%.3f" />'%offset \
-    %(axes[axis])
+    xmls = '<command name="Reference" axis="Axis %s" Offset="%.3f" />' \
+    %(axes[axis], offset)
     msg = bytes(xmls,"UTF-8")
     self.socket.send(msg)
 
