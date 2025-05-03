@@ -13,6 +13,7 @@ cont.connect()
 # cont.move("y", 0, asycont600.MOVE_TYPE.ABSOLUTE)
 # cont.move("y", -2, "relative", "fast")
 print(cont.position("y"))
+cont.pos_low_lim("y")
 # cont.set_ref0("y")
 cont.disconnect()
 

@@ -1,5 +1,5 @@
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 import socket
 import time
@@ -62,7 +62,7 @@ class Asycont600_2:
     self.socket.send(msg)
 
   def position(self, axis: str) -> float:
-    xmls = '<state><section name="Axis %s"><query name="System Position" /></section></state>' \
+    xmls = '<par><section name="Axis %s"><query name="Position" /></section></par>' \
     %(axes[axis]) 
     # print(xmls)
     msg = bytes(xmls,"UTF-8")
@@ -81,7 +81,7 @@ class Asycont600_2:
       raise 
 
   def pos_low_lim(self, axis: str) -> float:
-    xmls = '<state><section name="Axis %s"><query name="System Position" /></section></state>' \
+    xmls = '<par><section name="Axis %s"><query name="Position" /></section></par>' \
     %(axes[axis]) 
     # print(xmls)
     msg = bytes(xmls,"UTF-8")
