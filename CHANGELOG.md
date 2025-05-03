@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2025-05-03
+
+### Added
+- Psition lower limit function
+
 ## [0.6.1] - 2025-04-24
 
 ### Fixed

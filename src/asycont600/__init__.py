@@ -1,5 +1,5 @@
 
-__version__ = "0.6.1"
+__version__ = "0.7.0"
 
 import socket
 import time
@@ -70,6 +70,25 @@ class Asycont600_2:
     try:
       resp = self.socket.recv(4*1024)
       pos  = float(ElementTree.fromstring(resp.decode()).find("section").find("entry").get("v1"))
+      if axis == "x" or axis == "y" or axis == "z" or axis == "autslide":
+        return round(pos, 3)
+      elif axis == "pol":
+        return round(pos, 3)
+      else:
+        return round(pos, 2)
+    except:
+      print("Read error")
+      raise 
+
+  def pos_low_lim(self, axis: str) -> float:
+    xmls = '<state><section name="Axis %s"><query name="System Position" /></section></state>' \
+    %(axes[axis]) 
+    # print(xmls)
+    msg = bytes(xmls,"UTF-8")
+    self.socket.send(msg)
+    try:
+      resp = self.socket.recv(4*1024)
+      pos  = float(ElementTree.fromstring(resp.decode()).find("section").find("entry").get("min"))
       if axis == "x" or axis == "y" or axis == "z" or axis == "autslide":
         return round(pos, 3)
       elif axis == "pol":
