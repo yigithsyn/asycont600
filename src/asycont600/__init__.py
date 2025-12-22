@@ -1,5 +1,5 @@
 
-__version__ = "0.7.1"
+__version__ = "0.8.0"
 
 import socket
 import time
@@ -62,7 +62,7 @@ class Asycont600_2:
     self.socket.send(msg)
 
   def position(self, axis: str) -> float:
-    xmls = '<par><section name="Axis %s"><query name="Position" /></section></par>' \
+    xmls = '<par><section name="Axis %s"><query name="System Position" /></section></par>' \
     %(axes[axis]) 
     # print(xmls)
     msg = bytes(xmls,"UTF-8")
