@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2025-12-31
+
+### Changed
+- Always return actual positions
+
 ## [0.7.1] - 2025-04-24
 
 ### Fixed
