@@ -1,9 +1,7 @@
 
-__version__ = "0.8.1"
+__version__ = "0.9.0"
 
 import socket
-import time
-import xml.etree.ElementTree as ET
 import xml.etree.ElementTree as ElementTree
 from enum import StrEnum
 
