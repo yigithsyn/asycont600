@@ -1,7 +1,8 @@
-import sys
 import argparse
+import sys
 
 from asycont600 import Asycont600_2, axes
+
 
 def app():
     if len(sys.argv)>1 and sys.argv[1] == "move":
@@ -14,10 +15,27 @@ def app():
         except Exception as e:
             print(parser.format_help())
             print(str(e))
-            exit()
+            sys.exit()
         cont = Asycont600_2()
         cont.connect()
         cont.move(args.axis[0], args.pos[0], "absolute" if args.absolute else "relative", "slow")
+    elif len(sys.argv)>1 and sys.argv[1] == "position":
+        parser = argparse.ArgumentParser(prog="position", description="Get Current Position")
+        parser.add_argument("axis", help="axis name [x, y, z, autslide, azimuth, pol]", type=str, nargs="?")
+        parser.add_argument("--absolute", help="absolutely position", action="store_true")
+        try:
+            args = parser.parse_args(sys.argv[2:])
+        except Exception as e:
+            print(parser.format_help())
+            print(str(e))
+            sys.exit()
+        cont = Asycont600_2()
+        cont.connect()
+        # If args.axis is None call position function without arguments otherwise supply axis info
+        if args.axis is None:
+            print(cont.position())
+        else:
+            print(cont.position(args.axis))
     elif len(sys.argv)>1 and sys.argv[1] == "stop":
         parser = argparse.ArgumentParser(prog="move", description="Move Axis")
         parser.add_argument("axis", help="axis name [x, y, z, autslide, azimuth, pol]", type=str, nargs="?")
@@ -26,7 +44,7 @@ def app():
         except Exception as e:
             print(parser.format_help())
             print(str(e))
-            exit()
+            sys.exit()
         if args.axis and len(args.axis) > 0:
             print(args.axis)
             cont = Asycont600_2()
@@ -77,6 +95,7 @@ def app():
     else:
         parser = argparse.ArgumentParser(prog="asycont600", description="ASYCONT600 Command line Utility")
         parser.add_argument("move", help="move axis", type=str, nargs="?")
+        parser.add_argument("position", help="get current position", type=str, nargs="?")
         parser.add_argument("stop", help="stop axis", type=str, nargs="?")
         print(parser.format_help().replace("positional arguments","module/function").replace("[move] ","").replace("[stop] ","").replace("[swr2gamma] ","").replace("[wlen2freq] ","").replace("[measurement] ","").replace("[propagation] ","").replace("[propagation]","[module/function]"))
 

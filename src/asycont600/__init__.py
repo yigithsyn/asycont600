@@ -1,9 +1,10 @@
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
+import json
 import socket
-import xml.etree.ElementTree as ElementTree
 from enum import StrEnum
+from xml.etree import ElementTree
 
 axes = {
   "x"       : "1",
@@ -59,7 +60,11 @@ class Asycont600_2:
     msg = bytes(xmls,"UTF-8")
     self.socket.send(msg)
 
-  def position(self, axis: str) -> float:
+  def position(self, axis: str | None = None) -> float | str:
+    # If axis is not given return all axes positions as json
+    if axis is None:
+      return json.dumps({axis_name: self.position(axis_name) for axis_name in axes})
+    
     xmls = '<state><section name="Axis %s"><query name="System Position" /></section></state>' \
     %(axes[axis]) 
     # print(xmls)
@@ -68,9 +73,7 @@ class Asycont600_2:
     try:
       resp = self.socket.recv(4*1024)
       pos  = float(ElementTree.fromstring(resp.decode()).find("section").find("entry").get("v1"))
-      if axis == "x" or axis == "y" or axis == "z" or axis == "autslide":
-        return round(pos, 3)
-      elif axis == "pol":
+      if axis == "x" or axis == "y" or axis == "z" or axis == "autslide" or axis == "pol":
         return round(pos, 3)
       else:
         return round(pos, 2)
@@ -79,6 +82,7 @@ class Asycont600_2:
       raise 
 
   def pos_low_lim(self, axis: str) -> float:
+
     xmls = '<par><section name="Axis %s"><query name="Position" /></section></par>' \
     %(axes[axis]) 
     # print(xmls)
@@ -87,9 +91,7 @@ class Asycont600_2:
     try:
       resp = self.socket.recv(4*1024)
       pos  = float(ElementTree.fromstring(resp.decode()).find("section").find("entry").get("min"))
-      if axis == "x" or axis == "y" or axis == "z" or axis == "autslide":
-        return round(pos, 3)
-      elif axis == "pol":
+      if axis == "x" or axis == "y" or axis == "z" or axis == "autslide" or axis == "pol":
         return round(pos, 3)
       else:
         return round(pos, 2)
